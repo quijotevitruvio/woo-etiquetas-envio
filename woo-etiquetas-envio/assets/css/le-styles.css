@@ -1,0 +1,397 @@
+/* ==========================================================================
+   Etiquetas y envío - Estilos Minimalistas
+   ========================================================================== */
+
+/* --- Notify form --- */
+.le-notify-form { margin: 16px 0; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fafafa; font-family: var(--le-font, inherit); }
+.le-notify-form label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+.le-notify-row { display: flex; gap: 8px; }
+.le-notify-row input[type="email"] { flex: 1; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+.le-notify-row button { padding: 8px 14px; background: #1a1a1a; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.le-notify-row button:hover { background: #333; }
+.le-notify-row button:disabled { opacity: .5; cursor: not-allowed; }
+.le-notify-msg { margin: 8px 0 0; font-size: 13px; min-height: 16px; }
+.le-notify-msg--ok { color: #059669; }
+.le-notify-msg--error { color: #dc2626; }
+
+/* --- Recent sale --- */
+.le-recent-sale {
+	display: inline-block;
+	margin: 8px 0;
+	padding: 4px 10px;
+	background: #fef3c7;
+	color: #92400e;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 500;
+	font-family: var(--le-font, inherit);
+	animation: le-fade-in .4s ease;
+}
+@keyframes le-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* --- Cart estimator row --- */
+.le-cart-estimator td { padding: 12px 0 !important; }
+.le-cart-estimator .le-delivery-box { margin: 0; }
+
+/* Chip unificado: píldora oscura con texto blanco (colores configurables
+   en los ajustes; el estilo inline del PHP fija el color final). Los !important
+   ganan a los colores inline de los ajustes; los overrides granulares por
+   badge (con !important inline) siguen ganando si se configuran. */
+.le-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    color: #fff !important;
+    font-size: 0.7rem !important;
+    font-weight: 400 !important;
+    letter-spacing: normal;
+    text-transform: none;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+.le-badge .le-badge__text {
+    color: #fff !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    font-family: inherit !important;
+}
+
+.le-badge .le-badge__emojis {
+    font-size: inherit !important;
+    line-height: 1 !important;
+}
+
+/* Posición: la elige cada badge en sus ajustes (le-badges-pos--*).
+   le-badges.js ajusta el contenedor al rectángulo real de la carátula
+   (clase le-fit-img) y aquí las 9 posiciones se vuelven alineación flex
+   DENTRO de la imagen — nunca más badges flotando en el espacio blanco. */
+.le-badges-container.le-fit-img {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.le-fit-img.le-badges-pos--top-left,
+.le-fit-img.le-badges-pos--top-center,
+.le-fit-img.le-badges-pos--top-right { justify-content: flex-start; }
+
+.le-fit-img.le-badges-pos--center-left,
+.le-fit-img.le-badges-pos--center-center,
+.le-fit-img.le-badges-pos--center-right { justify-content: center; }
+
+.le-fit-img.le-badges-pos--bottom-left,
+.le-fit-img.le-badges-pos--bottom-center,
+.le-fit-img.le-badges-pos--bottom-right { justify-content: flex-end; }
+
+.le-fit-img.le-badges-pos--top-left,
+.le-fit-img.le-badges-pos--center-left,
+.le-fit-img.le-badges-pos--bottom-left { align-items: flex-start; }
+
+.le-fit-img.le-badges-pos--top-center,
+.le-fit-img.le-badges-pos--center-center,
+.le-fit-img.le-badges-pos--bottom-center { align-items: center; }
+
+.le-fit-img.le-badges-pos--top-right,
+.le-fit-img.le-badges-pos--center-right,
+.le-fit-img.le-badges-pos--bottom-right { align-items: flex-end; }
+
+/* ── Aparición sin salto ─────────────────────────────────────────────────
+   Los badges nacen invisibles y aparecen cuando le-badges.js ya los ancló
+   a la carátula (.le-fit-img). Red de seguridad: si el JS no corre (error,
+   bloqueado), un keyframe los revela solo a los 0.9s en su posición CSS. */
+.le-badges-container--catalog,
+.le-badges-container--single {
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    animation: le-reveal 0.18s ease 0.9s forwards;
+}
+
+.le-badges-container.le-fit-img {
+    opacity: 1;
+    animation: none;
+}
+
+@keyframes le-reveal {
+    to { opacity: 1; }
+}
+
+/* ── Carruseles LM: badges FIJOS en centro-derecha, sin animación ────────
+   Gana sobre la posición configurada y sobre cualquier animación del
+   emoji: en un carrusel que ya se mueve, el badge quieto se lee mejor. */
+.lmc-card-media .le-badges-container {
+    top: 50% !important;
+    right: 10px !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+    align-items: flex-end !important;
+    /* En carrusel no hay re-anclaje JS: visibles desde el primer paint. */
+    opacity: 1 !important;
+    animation: none !important;
+}
+
+.lmc-card-media .le-badge,
+.lmc-card-media .le-badge__emojis {
+    animation: none !important;
+}
+
+/* Contenedor de Múltiples Badges */
+.le-badges-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Catalog context */
+a.woocommerce-LoopProduct-link,
+.woocommerce-product-gallery__image,
+.product-image,
+.image-wrapper {
+    position: relative;
+    display: block;
+}
+.le-badges-container--catalog,
+.le-badges-container--single {
+    position: absolute !important;
+    z-index: 9999 !important;
+    pointer-events: none; /* Evita que bloquee clicks en la imagen */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.le-badges-container--catalog .le-badge,
+.le-badges-container--single .le-badge {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+}
+
+/* Posiciones sobre la imagen */
+.le-badges-pos--top-left { top: 10px; left: 10px; align-items: flex-start; }
+.le-badges-pos--top-center { top: 10px; left: 50%; transform: translateX(-50%); align-items: center; }
+.le-badges-pos--top-right { top: 10px; right: 10px; align-items: flex-end; }
+
+.le-badges-pos--center-left { top: 50%; left: 10px; transform: translateY(-50%); align-items: flex-start; }
+.le-badges-pos--center-center { top: 50%; left: 50%; transform: translate(-50%, -50%); align-items: center; }
+.le-badges-pos--center-right { top: 50%; right: 10px; transform: translateY(-50%); align-items: flex-end; }
+
+.le-badges-pos--bottom-left { bottom: 10px; left: 10px; align-items: flex-start; }
+.le-badges-pos--bottom-center { bottom: 10px; left: 50%; transform: translateX(-50%); align-items: center; }
+.le-badges-pos--bottom-right { bottom: 10px; right: 10px; align-items: flex-end; }
+
+/* Posiciones con margen extra (más despegadas del borde) */
+.le-badges-pos--top-left-offset    { top: 20px; left: 20px; align-items: flex-start; }
+.le-badges-pos--top-right-offset   { top: 20px; right: 20px; align-items: flex-end; }
+.le-badges-pos--bottom-left-offset { bottom: 20px; left: 20px; align-items: flex-start; }
+.le-badges-pos--bottom-right-offset{ bottom: 20px; right: 20px; align-items: flex-end; }
+
+/* Bandas full-width */
+.le-badges-pos--strip-top {
+    top: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55), transparent);
+    padding: 8px 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+.le-badges-pos--strip-bottom {
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent);
+    padding: 8px 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Cintas diagonales (ribbons) */
+.le-badges-pos--ribbon-tl,
+.le-badges-pos--ribbon-tr {
+    overflow: hidden;
+    pointer-events: none;
+}
+.le-badges-pos--ribbon-tl {
+    top: 0; left: 0; width: 130px; height: 130px;
+    align-items: flex-start;
+}
+.le-badges-pos--ribbon-tr {
+    top: 0; right: 0; width: 130px; height: 130px;
+    align-items: flex-end;
+}
+.le-badges-pos--ribbon-tl .le-badge,
+.le-badges-pos--ribbon-tr .le-badge {
+    position: absolute;
+    width: 180px;
+    text-align: center;
+    justify-content: center;
+    padding: 6px 0;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+.le-badges-pos--ribbon-tl .le-badge {
+    top: 30px; left: -50px;
+    transform: rotate(-45deg);
+}
+.le-badges-pos--ribbon-tr .le-badge {
+    top: 30px; right: -50px;
+    transform: rotate(45deg);
+}
+
+/* Sticker flotante centrado */
+.le-badges-pos--floating-center {
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+}
+.le-badges-pos--floating-center .le-badge {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15);
+    transform: scale(1.15);
+}
+
+/* Verticales (rotados) */
+.le-badges-pos--vertical-left {
+    top: 50%; left: 4px;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left center;
+    align-items: flex-start;
+}
+.le-badges-pos--vertical-right {
+    top: 50%; right: 4px;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: right center;
+    align-items: flex-end;
+}
+
+/* Ocultar badges por defecto de WooCommerce/Temas/Bloques */
+.woocommerce span.onsale,
+.woocommerce-page span.onsale,
+.woocommerce ul.products li.product .onsale,
+.onsale,
+.badge-inner.onsale-inner,
+.wc-block-components-product-sale-badge,
+.wc-block-components-product-sale-badge--align-right,
+.wc-block-components-product-sale-badge--align-left {
+    display: none !important;
+}
+
+
+/* Tipos (Colores ahora inyectados inline) */
+.le-badge--express {
+}
+.le-badge--imported {
+}
+.le-badge--sale {
+}
+
+/* Caja de Entrega Minimalista */
+.le-delivery-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 16px 0;
+}
+.le-delivery-box__icon {
+    font-size: 18px;
+    opacity: 0.8;
+}
+.le-delivery-box__content {
+    display: flex;
+    flex-direction: column;
+}
+.le-delivery-box__title {
+    font-size: 10px;
+    color: #999;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+.le-delivery-box__dates {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111;
+    line-height: 1.4;
+}
+.le-delivery-box__meta {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   Animaciones @keyframes Puras
+   ========================================================================== */
+
+@keyframes le-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    75% { transform: translateY(-3px); }
+}
+
+/* Rango corto: el emoji vibra sin montarse sobre el texto. */
+@keyframes le-dash {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-2px); }
+    40% { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes le-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes le-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes le-fly {
+    0% { transform: translateX(0) translateY(0) rotate(0); }
+    50% { transform: translateX(10px) translateY(-10px) rotate(-5deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0); }
+}
+
+@keyframes le-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Clases de animación asignadas */
+.le-anim-rebote .le-badge__emojis { animation: le-bounce 1.8s ease-in-out infinite; }
+.le-anim-arranque_rapido .le-badge__emojis { animation: le-dash 1.6s cubic-bezier(0.4,0,0.2,1) infinite; }
+.le-anim-pulso .le-badge__emojis { animation: le-pulse 2s ease-in-out infinite; }
+.le-anim-vibracion_turbo .le-badge__emojis { animation: le-shake 0.4s linear infinite; }
+.le-anim-vuelo_suave .le-badge__emojis { animation: le-fly 3s ease-in-out infinite; }
+.le-anim-flotacion .le-badge__emojis { animation: le-float 2.5s ease-in-out infinite; }
+.le-anim-pulso_lento .le-badge__emojis { animation: le-pulse 4s ease-in-out infinite; }
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    
+    .le-badge {
+        background: #222;
+        color: #eee;
+    }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .le-badge__emojis {
+        animation: none !important;
+    }
+}
+
