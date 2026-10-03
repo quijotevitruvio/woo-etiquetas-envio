@@ -1,4 +1,4 @@
-# Seguridad — Woo Etiquetas de Envío 1.0.0
+# Seguridad — Woo Etiquetas de Envío 1.0.1
 
 Revisión del código publicado (2026-10-03). El plugin no imprime etiquetas de pedido ni maneja datos de remitente: «etiquetas» son los badges de producto. No lee direcciones ni teléfonos de clientes; de los pedidos solo cuenta ventas y fechas («vendido hace X», «más vendido»).
 
@@ -9,6 +9,8 @@ Revisión del código publicado (2026-10-03). El plugin no imprime etiquetas de 
 | 1 | `/badges-by-url` público (`__return_true`) sin límite: cada petición acepta 100 URLs, consulta la base y crea transients; respondía con IDs de producto en `debug` y resolvía borradores o privados. | `includes/class-le-api.php` | Media (DoS/enumeración) | Límite por IP (60/min), solo productos publicados, `debug` solo con `manage_woocommerce`. |
 | 2 | `/delivery-box/{id}` devolvía estado de stock y plazo de cualquier producto, también borradores o privados (el nonce `wp_rest` lo tiene cualquier visitante). | `includes/class-le-api.php` | Baja | Solo productos publicados (variaciones: también el padre). |
 | 3 | `/notify` aceptaba correos para cualquier producto (privados, borradores, en stock) y sin tope: un tercero podía inscribir direcciones ajenas en masa. | `includes/class-le-notify.php` | Media-baja | Solo productos publicados que muestran el formulario; tope de 500 correos por producto; correos en minúsculas. |
+| 3b | (1.0.1) El límite de `/badges-by-url` contaba dos veces cada petición (WordPress repite `permission_callback` al armar la cabecera `Allow`), así que el tope real era la mitad; y la IP salía de `REMOTE_ADDR` sin opción para proxies. | `includes/class-le-api.php` | Baja | Una cuenta por petición; IP real con `client_ip()` (usa `lm_ip_real()` de Woo Tienda Segura si está, nunca `X-Forwarded-For`); tope filtrable. Probado en producción: 120 peticiones con `X-Forwarded-For` distinto en cada una → la 121 recibe 429. |
+| 3c | (1.0.1) El mismo doble conteo afectaba a `/cart-shipping` y `/delivery-box` (`permission_check`, con nonce): el tope de 30/min era 15 en la práctica. | `includes/class-le-api.php` | Baja | Resultado guardado por petición (`spl_object_id`): una cuenta por petición. |
 
 ## Pendiente (no trivial)
 

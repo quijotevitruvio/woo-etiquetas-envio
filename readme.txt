@@ -6,7 +6,7 @@ Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.1
 Requires Plugins: woocommerce
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,10 +58,16 @@ Only the ISBN lookup (Open Library and Google Books, admin only, cached for 30 d
 
 == Changelog ==
 
+= 1.0.1 =
+* Security: the public badges endpoint now counts each request once (WordPress ran the permission check twice) and keys its rate limit on the real client IP (never X-Forwarded-For).
+
 = 1.0.0 =
 * First public release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Security fix for the public badges endpoint rate limit.
 
 = 1.0.0 =
 First public release.

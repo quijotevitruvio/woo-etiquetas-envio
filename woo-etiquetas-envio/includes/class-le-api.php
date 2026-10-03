@@ -139,10 +139,18 @@ final class Api {
 	 * Límite por IP para el endpoint público de badges.
 	 */
 	public function public_rate_check( \WP_REST_Request $request ) {
-		if ( ! $this->check_rate_limit( 'le_rlp_', self::PUBLIC_RATE_LIMIT_MAX ) ) {
-			return new \WP_Error( 'rest_too_many', __( 'Demasiadas solicitudes.', 'woo-etiquetas-envio' ), [ 'status' => 429 ] );
+		// WordPress vuelve a llamar a permission_callback al armar la cabecera
+		// Allow (rest_send_allow_header): contar una sola vez por petición.
+		static $resultado = null;
+		if ( null !== $resultado ) {
+			return $resultado;
 		}
-		return true;
+		$max       = (int) apply_filters( 'woo_etiquetas_envio_public_rate_limit_max', self::PUBLIC_RATE_LIMIT_MAX );
+		$resultado = true;
+		if ( ! $this->check_rate_limit( 'le_rlp_', max( 1, $max ) ) ) {
+			$resultado = new \WP_Error( 'rest_too_many', __( 'Demasiadas solicitudes.', 'woo-etiquetas-envio' ), [ 'status' => 429 ] );
+		}
+		return $resultado;
 	}
 
 	/**
@@ -178,18 +186,42 @@ final class Api {
 	 * Permission check con nonce + rate limit por IP.
 	 */
 	public function permission_check( \WP_REST_Request $request ) {
+		// WordPress vuelve a llamar a permission_callback al armar la cabecera
+		// Allow (rest_send_allow_header) con la MISMA petición: se guarda el
+		// resultado por petición para contar el límite una sola vez (si no, el
+		// tope real de /cart-shipping y /delivery-box era la mitad).
+		static $resultados = [];
+		$clave = spl_object_id( $request );
+		if ( isset( $resultados[ $clave ] ) ) {
+			return $resultados[ $clave ];
+		}
 		if ( ! Settings::verify_rest_nonce( $request ) ) {
-			return new \WP_Error( 'rest_forbidden', __( 'Nonce inválido.', 'woo-etiquetas-envio' ), [ 'status' => 403 ] );
+			$resultados[ $clave ] = new \WP_Error( 'rest_forbidden', __( 'Nonce inválido.', 'woo-etiquetas-envio' ), [ 'status' => 403 ] );
+		} elseif ( ! $this->check_rate_limit() ) {
+			$resultados[ $clave ] = new \WP_Error( 'rest_too_many', __( 'Demasiadas solicitudes.', 'woo-etiquetas-envio' ), [ 'status' => 429 ] );
+		} else {
+			$resultados[ $clave ] = true;
 		}
-		if ( ! $this->check_rate_limit() ) {
-			return new \WP_Error( 'rest_too_many', __( 'Demasiadas solicitudes.', 'woo-etiquetas-envio' ), [ 'status' => 429 ] );
+		return $resultados[ $clave ];
+	}
+
+	/**
+	 * IP real del visitante para los límites. Nunca X-Forwarded-For (se falsea).
+	 * Si existe lm_ip_real() (Woo Tienda Segura: REMOTE_ADDR, o CF-Connecting-IP
+	 * solo cuando la conexión viene de un rango de Cloudflare) se usa esa; si no,
+	 * REMOTE_ADDR. Filtro `woo_etiquetas_envio_client_ip` para otros proxies.
+	 */
+	public static function client_ip(): string {
+		$ip = function_exists( 'lm_ip_real' ) ? (string) lm_ip_real() : '';
+		if ( '' === $ip && isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = (string) filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ); // phpcs:ignore
 		}
-		return true;
+		$ip = (string) apply_filters( 'woo_etiquetas_envio_client_ip', $ip );
+		return '' !== $ip ? $ip : 'unknown';
 	}
 
 	private function check_rate_limit( string $prefix = 'le_rl_', int $max = self::RATE_LIMIT_MAX ): bool {
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
-		$key = $prefix . md5( $ip );
+		$key = $prefix . md5( self::client_ip() );
 		$count = (int) get_transient( $key );
 		if ( $count >= $max ) {
 			return false;

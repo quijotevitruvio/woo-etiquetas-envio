@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado semántico.
 
+## [1.0.1] - 2026-10-03
+### Seguridad
+- `/badges-by-url`: el límite por IP contaba dos veces cada petición (WordPress repite `permission_callback` para la cabecera `Allow`); ahora cuenta una. Tope filtrable con `woo_etiquetas_envio_public_rate_limit_max`.
+- `/cart-shipping` y `/delivery-box` (con nonce): el mismo doble conteo dejaba el tope real en 15/min en vez de 30; `permission_check` guarda el resultado por petición y cuenta una vez.
+- Los límites usan la IP real (`lm_ip_real()` si existe, si no `REMOTE_ADDR`; filtro `woo_etiquetas_envio_client_ip`), nunca `X-Forwarded-For`.
+
 ## [1.0.0] - 2026-10-03
 ### Añadido
 - Primera versión pública: etiqueta única anclada a la portada (oferta / quedan N / última unidad), fecha estimada de envío, líneas de servicio y ajustes avanzados de etiquetas.

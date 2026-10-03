@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Woo Etiquetas de Envío
  * Description: Una sola etiqueta sobre la portada (oferta o existencias), fecha estimada de envío y líneas de servicio para WooCommerce.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Andrés Valencia Tobón
  * Author URI: https://github.com/quijotevitruvio
  * License: GPL-2.0-or-later
@@ -28,7 +28,7 @@ if (!defined('ABSPATH')) {
 
 final class Woo_Etiquetas_Envio
 {
-	public const VERSION = '1.0.0';
+	public const VERSION = '1.0.1';
 
 	private static ?Woo_Etiquetas_Envio $instance = null;
 
